@@ -7,6 +7,7 @@ import {
   Text,
   Image,
   Alert,
+  Animated,
   StyleSheet,
   Dimensions,
   TouchableWithoutFeedback
@@ -15,10 +16,37 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default class User extends Component {
+  state = {
+    opacity: new Animated.Value(0),
+    offset: new Animated.ValueXY({x: 0, y: 60}),
+  }
+
+  componentDidMount() {
+    Animated.parallel([
+      Animated.spring(this.state.offset.y, {
+        toValue: 0,
+        speed: 3,
+        bounciness: 20
+      }),
+      Animated.timing(this.state.opacity, {
+        toValue: 1,
+        duration: 500
+      }),
+    ]).start();
+  }
+
   render() {
     const { user } = this.props;
 
     return (
+      <Animated.View style={[
+        { 
+          transform: [ 
+          ...this.state.offset.getTranslateTransform() 
+          ]
+        },
+        { opacity: this.state.opacity },
+      ]}>
       <TouchableWithoutFeedback onPress={this.props.onPress}>
         <View style={styles.userContainer}>
           <Image style={styles.thumbnail} source={{ uri: user.thumbnail }} />
@@ -35,6 +63,7 @@ export default class User extends Component {
           </View>
         </View>
       </TouchableWithoutFeedback>
+      </Animated.View>
     );
   }
 }
